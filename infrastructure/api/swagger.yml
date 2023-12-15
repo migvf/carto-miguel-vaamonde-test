@@ -1,0 +1,208 @@
+openapi: 3.0.3
+info:
+  title: Swagger Carto Test - Miguel Vaamonde - OpenAPI 3.0
+  description: "This the carto test project from Miguel Vaamonde"
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: mvaamfer@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+  - url: http:localhost:8000
+paths:
+  /login:
+    post:
+      summary: Login into carto test application
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Access denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Access denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /tables/{tableFqn}/geoJson:
+    get:
+      summary: Endpoint which returns a BigQuery Table in a GeoJSON format
+      operationId: getBigQueryTableGeoJson
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tableFqn
+          in: path
+          description: Big query table fully qualified name
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: limit of the subset returned (default on server side is 100)
+          schema:
+            type: integer
+            format: int64
+        - name: offset
+          in: query
+          description: offset to be returned (default on server side is 0). If offset is greater than max offset, you will receive the max offset as response
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetBigQueryTableResponse"
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /tiles/{tilesetFqn}:
+    get:
+      summary: Endpoint which returns the tiles of a tile set
+      operationId: getTileSetTiles
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tilesetFqn
+          in: path
+          description: Tile set fully qualified name
+          required: true
+          schema:
+            type: string
+        - name: x
+          in: query
+          description: Tile set x coordinate
+          required: true
+          schema:
+            type: integer
+        - name: y
+          in: query
+          description: Tile set y coordinate
+          required: true
+          schema:
+            type: integer
+        - name: z
+          in: query
+          description: Tile set z coordinate
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          example: pepe
+        password:
+          type: string
+          example: pepePass
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiQURNSU4iLCJpYXQiOjE3MDI1OTM0ODQsImV4cCI6MTcwMjYwMDY4NH0.ubKtEAxs3_k_L52HU2DBWqI2-gwPJLXPrApGSxigXls
+    GetBigQueryTableResponse:
+      type: object
+      properties:
+        type:
+          type: string
+          example: FeatureCollection
+        features:
+          type: array
+          items:
+            $ref: '#/components/schemas/Feature'
+    Feature:
+      type: object
+      properties:
+        type:
+          type: string
+          example: Feature
+        geometry:
+          $ref: '#/components/schemas/Geometry'
+        properties:
+          type: object
+          description: variable json object with dynamic properties
+    Geometry:
+      type: object
+      properties:
+        type:
+          type: string
+          example: Point
+        coordinates:
+          type: array
+          items:
+            type: integer
+    ErrorResponse:
+      type: object
+      properties:
+        errorKey:
+          type: string
+          example: ERROR_KEY
+        message:
+          type: string
+          example: error description

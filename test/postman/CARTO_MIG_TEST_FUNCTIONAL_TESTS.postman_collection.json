@@ -1,0 +1,356 @@
+{
+	"info": {
+		"_postman_id": "0f692984-473d-40d6-9e95-afc8645f0eed",
+		"name": "CARTO_MIG_TEST_FUNCTIONAL_TESTS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28625291"
+	},
+	"item": [
+		{
+			"name": "should_login_be_OK_for_valid_credentials",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"LOGIN for valid credentials - Status code is 200\", function(){",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"LOGIN for valid credentials - Response must contain the access token\", function(){",
+							"    const jsonResponse = pm.response.json();",
+							"    pm.expect(jsonResponse).not.null;",
+							"    pm.expect(jsonResponse.hasOwnProperty(\"token\")).true;",
+							"    pm.expect(jsonResponse.token).not.empty;",
+							"    pm.environment.set(\"cartoTestAccessToken\", jsonResponse.token);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"mig@test.com\",\n    \"password\": \"easy\"\n}"
+				},
+				"url": {
+					"raw": "localhost:8000/login",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "should_login_be_KO_for_invalid_credentials",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"LOGIN for valid credentials - Status code is 200\", function(){",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							"pm.test(\"LOGIN for valid credentials - Response must contain the access token\", function(){",
+							"    const jsonResponse = pm.response.json();",
+							"    pm.expect(jsonResponse).not.null;",
+							"    pm.expect(jsonResponse.hasOwnProperty(\"errorKey\")).true;",
+							"    pm.expect(jsonResponse.hasOwnProperty(\"errorMessage\")).true;",
+							"    pm.expect(jsonResponse.errorKey).not.empty;",
+							"    pm.expect(jsonResponse.errorMessage).not.empty;",
+							"    pm.expect(jsonResponse.errorKey).eqls(\"LOGIN_INVALID_CREDENTIALS\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"unknown@test.com\",\n    \"password\": \"uknown\"\n}"
+				},
+				"url": {
+					"raw": "localhost:8000/login",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "should_get_table_KO_due_to_expired_token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"GET BIG QUERY TABLE, GEOJSON. EXPIRED TOKEN - Status code is 401\", function(){",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							"pm.test(\"GET BIG QUERY TABLE, GEOJSON. EXPIRED TOKEN - Response validation contains expected error object\", function(){",
+							"    const jsonResponse = pm.response.json();",
+							"    pm.expect(jsonResponse).not.null;",
+							"    pm.expect(jsonResponse.hasOwnProperty(\"errorKey\")).true;",
+							"    pm.expect(jsonResponse.hasOwnProperty(\"errorMessage\")).true;",
+							"    pm.expect(jsonResponse.errorKey).not.empty;",
+							"    pm.expect(jsonResponse.errorMessage).not.empty;",
+							"    pm.expect(jsonResponse.errorKey).eqls(\"ACCESS_DENIED\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiQURNSU4iLCJpYXQiOjE3MDI1OTM0ODQsImV4cCI6MTcwMjYwMDY4NH0.ubKtEAxs3_k_L52HU2DBWqI2-gwPJLXPrApGSxigXls",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/tables/carto-demo-data.demo_tables.retail_stores/geoJson",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"tables",
+						"carto-demo-data.demo_tables.retail_stores",
+						"geoJson"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "should_get_table_OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"GET BIG QUERY TABLE, GEOJSON. OK - Status code is 200\", function(){",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"GET BIG QUERY TABLE, GEOJSON. OK - Response validation contains expected objects\", function(){",
+							"    const jsonResponse = pm.response.json();",
+							"    const responseHeaders = pm.response.headers;",
+							"    pm.expect(jsonResponse).not.null;",
+							"    pm.expect(jsonResponse.hasOwnProperty(\"type\")).true;",
+							"    pm.expect(jsonResponse.hasOwnProperty(\"features\")).true;",
+							"    pm.expect(jsonResponse.type).not.empty;",
+							"    pm.expect(jsonResponse.features).not.empty;",
+							"    pm.expect(jsonResponse.type).eqls(\"FeatureCollection\");",
+							"   ",
+							"    pm.expect(responseHeaders.filter(header => header.key === \"limit\").length > 0).true;",
+							"    pm.expect(responseHeaders.filter(header => header.key === \"currentOffset\").length > 0).true;",
+							"    pm.expect(responseHeaders.filter(header => header.key === \"nextOffset\").length > 0).true;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{cartoTestAccessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/tables/carto-demo-data.demo_tables.retail_stores/geoJson",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"tables",
+						"carto-demo-data.demo_tables.retail_stores",
+						"geoJson"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "should_get_tiles_KO_due_to_invalid_request",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"GET tiles - KO - Invalid request - Response status should be 400\", function(){",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"GET tiles - KO - Invalid request - Response should contain error object\", function(){",
+							"    const jsonResponse = pm.response.json();",
+							"    pm.expect(jsonResponse).not.null;",
+							"    pm.expect(jsonResponse.hasOwnProperty(\"errorKey\")).true;",
+							"    pm.expect(jsonResponse.hasOwnProperty(\"errorMessage\")).true;",
+							"    pm.expect(jsonResponse.errorKey).eqls(\"INVALID_REQUEST\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{cartoTestAccessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/tiles/carto-demo-data.demo_tilesets.osm_buildings?x=2&y=3",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"tiles",
+						"carto-demo-data.demo_tilesets.osm_buildings"
+					],
+					"query": [
+						{
+							"key": "x",
+							"value": "2"
+						},
+						{
+							"key": "y",
+							"value": "3"
+						},
+						{
+							"key": null,
+							"value": "",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "should_get_tiles_OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"GET tiles - OK - Response status should be 200\", function(){",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"GET tiles - OK - Response should contain expected object\", function(){",
+							"    pm.expect(pm.response).not.null;",
+							"    pm.expect(pm.response).not.empty;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{cartoTestAccessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/tiles/carto-demo-data.demo_tilesets.osm_buildings?x=2&y=3&z=3",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"tiles",
+						"carto-demo-data.demo_tilesets.osm_buildings"
+					],
+					"query": [
+						{
+							"key": "x",
+							"value": "2"
+						},
+						{
+							"key": "y",
+							"value": "3"
+						},
+						{
+							"key": "z",
+							"value": "3"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
