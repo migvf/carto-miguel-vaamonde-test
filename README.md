@@ -139,7 +139,7 @@ You can check the documentation using any of the following options:
 
 ### Testing
 This application has some Unit test defined with Jest. Only as an example ( I did not have enough time to create more, sorry)
-* you can run dev executing npm test
+* you can run them executing npm test
 
 This application was also tested using some postman runners. Please check the collection provided. It is available inside /test/postman.
 
