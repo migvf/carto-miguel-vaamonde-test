@@ -116,7 +116,7 @@ I have created three endpoints to respond to everything requested in the test:
 **Problems faced**
 
 I had some problems to successfully test the get tiles endpoint. 
-It seems that the param partition is required (and I was forced to hardcoded it) ... and the CARTO API was retrieving aan 403 when using the access token generated with the machine to machine client credentials. Therefore, to unblock this endpoint, I have used the API token that i also create in my CARTO workspace.
+It seems that the param partition is required (and I was forced to hardcoded it) ... and the CARTO API was retrieving an 403 when using the access token generated with the machine to machine client credentials. Therefore, to unblock this endpoint, I have used the API token that I also have created in my CARTO workspace.
 
 ### API documentation
 
