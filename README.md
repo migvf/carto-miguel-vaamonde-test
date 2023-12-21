@@ -145,5 +145,5 @@ This application was also tested using some postman runners. Please check the co
 
 ### Possible applications improvements
 * To add dependency injection, to use the interfaces defined in the domain, instead of instantiating directly the objects using the IMPL classes from the infrastructure module
-* Get big query table data endpoint - The pagination should be also applied to the "server", CARTO, because if we received a lot of data from there, this applications can face memory crashes
+* Get big query table data endpoint - The pagination should be also applied to the "server", CARTO, because if we received a lot of data from there, this microservice can face memory crashes
 * To add more testing
